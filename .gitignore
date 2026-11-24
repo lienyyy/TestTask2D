@@ -1,0 +1,52 @@
+# Unity: генерируемые папки (по ТЗ в архив/репозиторий не входят)
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/[Mm]emoryCaptures/
+/[Rr]ecordings/
+
+# ВНИМАНИЕ: папка Build/ НЕ игнорируется — по ТЗ .exe-билд лежит в репозитории.
+# Игнорируем только служебные файлы билда, которые не нужны для запуска.
+/[Bb]uild/*_BurstDebugInformation_DoNotShip/
+/[Bb]uild/*_BackUpThisFolder_ButDontShipItWithYourGame/
+
+# Файлы IDE
+.vs/
+.vscode/
+.idea/
+.consulo/
+*.csproj
+*.unityproj
+*.sln
+*.slnx
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# Метаданные, генерируемые Unity при каждом открытии
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+sysinfo.txt
+mono_crash.*
+
+# Crashlytics / Gradle / прочее
+crashlytics-build.properties
+/[Aa]ssets/[Ss]treamingAssets/aa.meta
+/[Aa]ssets/[Ss]treamingAssets/aa/*
+.gradle/
+
+# ОС
+.DS_Store
+Thumbs.db
+desktop.ini
