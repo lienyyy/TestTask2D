@@ -2,9 +2,6 @@ using UnityEngine;
 
 namespace TestTask
 {
-    /// <summary>
-    /// Объект 1: при касании персонажа (OnTriggerEnter2D) увеличивает счётчик и исчезает.
-    /// </summary>
     [RequireComponent(typeof(Collider2D))]
     public sealed class Collectible : MonoBehaviour
     {
@@ -16,7 +13,6 @@ namespace TestTask
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            // _collected защищает от двойного срабатывания, если у игрока несколько коллайдеров.
             if (_collected || !other.CompareTag(playerTag)) return;
 
             _collected = true;

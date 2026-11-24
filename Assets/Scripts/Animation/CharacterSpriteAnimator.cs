@@ -2,12 +2,6 @@ using UnityEngine;
 
 namespace TestTask
 {
-    /// <summary>
-    /// Анимация idle/run кодом, без Animator.
-    /// В покое сразу ставится нейтральный кадр нужного направления — никакого «скольжения»
-    /// последним кадром бега и никаких задержек переходов (exit time, transition duration).
-    /// При смене направления во время бега номер кадра сохраняется, поэтому шаг не сбивается.
-    /// </summary>
     [DefaultExecutionOrder(-30)]
     [RequireComponent(typeof(SpriteRenderer))]
     public sealed class CharacterSpriteAnimator : MonoBehaviour
@@ -36,7 +30,6 @@ namespace TestTask
             {
                 if (!_wasMoving)
                 {
-                    // Первый кадр движения сразу отличается от позы покоя — отклик мгновенный.
                     _frame = 1;
                     _frameTimer = 0f;
                 }

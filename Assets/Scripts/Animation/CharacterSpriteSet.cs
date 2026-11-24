@@ -3,10 +3,6 @@ using UnityEngine;
 
 namespace TestTask
 {
-    /// <summary>
-    /// Кадры персонажа: 5 направлений × N кадров ходьбы.
-    /// Отдельных idle-кадров в спрайт-листе нет, поэтому idle — нейтральная поза (кадр idleFrameIndex).
-    /// </summary>
     [CreateAssetMenu(menuName = "TestTask/Character Sprite Set", fileName = "CharacterSprites")]
     public sealed class CharacterSpriteSet : ScriptableObject
     {
@@ -32,7 +28,6 @@ namespace TestTask
         private Sprite[] Frames(Facing facing) => directions[(int)facing].frames;
 
 #if UNITY_EDITOR
-        /// <summary>Используется только скриптом сборки сцены в редакторе.</summary>
         public void EditorSetFrames(Facing facing, Sprite[] frames)
         {
             if (directions == null || directions.Length != 5) directions = new DirectionFrames[5];

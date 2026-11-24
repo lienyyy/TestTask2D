@@ -3,7 +3,6 @@ using UnityEngine.UI;
 
 namespace TestTask
 {
-    /// <summary>Выводит значение счётчика в UI. Обновляется по событию, а не в Update.</summary>
     public sealed class CounterView : MonoBehaviour
     {
         [SerializeField] private CollectibleCounter counter;

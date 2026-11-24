@@ -2,11 +2,6 @@ using UnityEngine;
 
 namespace TestTask
 {
-    /// <summary>
-    /// Висит на персонаже. Запоминает интерактивный объект, в чью триггер-зону вошёл персонаж,
-    /// включает у него подсказку и вызывает Interact по нажатию E.
-    /// TryGetComponent вызывается только в OnTrigger-колбэках, а не каждый кадр.
-    /// </summary>
     public sealed class PlayerInteractor : MonoBehaviour
     {
         [SerializeField] private PlayerInputReader input;

@@ -2,11 +2,6 @@ using UnityEngine;
 
 namespace TestTask
 {
-    /// <summary>
-    /// Объект 2: показывает подсказку «E», пока персонаж в триггер-зоне,
-    /// по нажатию E выводит следующую реплику.
-    /// Вход/выход из зоны отслеживает <see cref="PlayerInteractor"/> на персонаже.
-    /// </summary>
     public sealed class Interactable : MonoBehaviour
     {
         [SerializeField] private GameObject prompt;

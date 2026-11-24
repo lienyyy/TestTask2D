@@ -3,7 +3,6 @@ using UnityEngine.InputSystem;
 
 namespace TestTask
 {
-    /// <summary>Выход из билда по Esc (в полноэкранном .exe иначе неудобно закрывать).</summary>
     public sealed class QuitOnEscape : MonoBehaviour
     {
         private InputAction _quit;

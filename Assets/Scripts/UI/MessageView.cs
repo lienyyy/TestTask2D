@@ -3,10 +3,6 @@ using UnityEngine.UI;
 
 namespace TestTask
 {
-    /// <summary>
-    /// Всплывающее сообщение внизу экрана. Скрипт включается только на время показа,
-    /// в остальное время Update не вызывается.
-    /// </summary>
     public sealed class MessageView : MonoBehaviour
     {
         [SerializeField] private Text label;

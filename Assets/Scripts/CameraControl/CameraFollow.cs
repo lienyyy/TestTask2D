@@ -2,13 +2,6 @@ using UnityEngine;
 
 namespace TestTask
 {
-    /// <summary>
-    /// Плавное следование ортографической камеры за целью с ограничением границами уровня.
-    /// - SmoothDamp сохраняет скорость камеры между кадрами, поэтому при смене направления
-    ///   нет рывка (скорость меняется плавно, без lookahead-скачков).
-    /// - В Start камера сразу ставится на цель — нет «подлёта» при старте.
-    /// - Ограничение учитывает текущий размер экрана (aspect), поэтому работает при любом разрешении.
-    /// </summary>
     [RequireComponent(typeof(Camera))]
     public sealed class CameraFollow : MonoBehaviour
     {
@@ -61,7 +54,6 @@ namespace TestTask
             return point;
         }
 
-        /// <summary>Если уровень уже экрана по оси — камера стоит по центру уровня.</summary>
         private static float ClampAxis(float value, float min, float max)
         {
             return min > max ? (min + max) * 0.5f : Mathf.Clamp(value, min, max);

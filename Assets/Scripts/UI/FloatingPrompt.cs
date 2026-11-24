@@ -2,7 +2,6 @@ using UnityEngine;
 
 namespace TestTask
 {
-    /// <summary>Лёгкое покачивание подсказки «E», чтобы она привлекала внимание.</summary>
     public sealed class FloatingPrompt : MonoBehaviour
     {
         [SerializeField, Min(0f)] private float amplitude = 0.08f;

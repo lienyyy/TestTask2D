@@ -4,19 +4,12 @@ using UnityEngine.InputSystem;
 
 namespace TestTask
 {
-    /// <summary>
-    /// Единственная точка чтения ввода. Остальные скрипты не знают про клавиши:
-    /// движение берёт <see cref="Move"/>, взаимодействие подписывается на <see cref="InteractPressed"/>.
-    /// Привязки через Input System идут по физическому положению клавиши,
-    /// поэтому WASD работает и при русской раскладке.
-    /// </summary>
     [DefaultExecutionOrder(-100)]
     public sealed class PlayerInputReader : MonoBehaviour
     {
         private InputAction _move;
         private InputAction _interact;
 
-        /// <summary>Вектор движения. Composite 2DVector уже нормализует диагональ.</summary>
         public Vector2 Move => _move != null ? _move.ReadValue<Vector2>() : Vector2.zero;
 
         public event Action InteractPressed;

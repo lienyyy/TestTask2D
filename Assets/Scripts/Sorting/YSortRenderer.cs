@@ -2,12 +2,6 @@ using UnityEngine;
 
 namespace TestTask
 {
-    /// <summary>
-    /// Сортировка по Y: чем ниже точка опоры (pivot у ног / основания) на экране,
-    /// тем больше sortingOrder и тем «ближе» объект.
-    /// Статичные объекты считаются один раз и выключают скрипт, подвижные — каждый кадр в LateUpdate,
-    /// после того как физика и интерполяция выставили позицию.
-    /// </summary>
     [DefaultExecutionOrder(100)]
     public sealed class YSortRenderer : MonoBehaviour
     {

@@ -2,7 +2,6 @@ using UnityEngine;
 
 namespace TestTask
 {
-    /// <summary>Прямоугольник уровня в мировых координатах (относительно этого объекта).</summary>
     public sealed class LevelBounds : MonoBehaviour
     {
         [SerializeField] private Rect area = new Rect(-19.2f, -5.4f, 38.4f, 10.8f);

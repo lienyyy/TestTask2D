@@ -13,16 +13,9 @@ using Object = UnityEngine.Object;
 
 namespace TestTask.EditorTools
 {
-    /// <summary>
-    /// Редакторский скрипт: настраивает импорт ассетов, нарежает спрайт-лист,
-    /// собирает сцену и делает Windows-билд. Только для удобной и воспроизводимой
-    /// сборки, в игру не попадает.
-    /// Меню: TestTask/... или из командной строки:
-    ///   Unity.exe -batchmode -projectPath . -executeMethod TestTask.EditorTools.ProjectBuilder.SetupAll -quit
-    /// </summary>
     public static class ProjectBuilder
     {
-        private const string CharacterSourcePath = "ArtSource/character_sheet.png"; // оригинал с белым фоном
+        private const string CharacterSourcePath = "ArtSource/character_sheet.png";
         private const string CharacterSheetPath = "Assets/Art/Character/character_sheet.png";
         private const string WallPath = "Assets/Art/Environment/wall.png";
         private const string FloorPath = "Assets/Art/Environment/floor.png";
@@ -41,9 +34,8 @@ namespace TestTask.EditorTools
         private const string BackgroundLayer = "Background";
         private const string OverlayLayer = "Overlay";
 
-        // ---- масштаб мира ----
-        private const float EnvironmentPpu = 200f;    // 3840x1080 -> 19.2 x 5.4 юнита
-        private const float CharacterCellHeight = 2.6f; // ячейка 1600px -> 2.6 юнита
+        private const float EnvironmentPpu = 200f;
+        private const float CharacterCellHeight = 2.6f;
         private const float BookWidth = 0.85f;
         private const float RockWidth = 2.1f;
 
@@ -51,10 +43,9 @@ namespace TestTask.EditorTools
         private const int SheetRows = 5;
         private const byte AlphaThreshold = 40;
 
-        // ---- уровень ----
-        private const float LevelHalfWidth = 19.2f;   // 2 тайла фона по 19.2
-        private const float StripHeight = 5.4f;       // высота стены и пола
-        private const float WalkTop = -0.15f;          // ноги не заходят на стену
+        private const float LevelHalfWidth = 19.2f;
+        private const float StripHeight = 5.4f;
+        private const float WalkTop = -0.15f;
         private const float WalkBottom = -5.2f;
         private const float WalkHalfWidth = 18.9f;
 
@@ -76,10 +67,6 @@ namespace TestTask.EditorTools
             "На камне выцарапано: «Не все книги стоит читать».",
             "Под камнем пусто. Только холодная пыль.",
         };
-
-        // =====================================================================
-        //  Точки входа
-        // =====================================================================
 
         [MenuItem("TestTask/Setup All (Import + Scene)")]
         public static void SetupAll()
@@ -117,7 +104,6 @@ namespace TestTask.EditorTools
 
             Font font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
 
-            // --- уровень ---
             GameObject level = new GameObject("Level");
             LevelBounds bounds = level.AddComponent<LevelBounds>();
             Configure(bounds, so => so.FindProperty("area").rectValue =
@@ -127,26 +113,21 @@ namespace TestTask.EditorTools
             CreateTiledBackground("Floor", level.transform, FloorPath, 1, spriteMaterial);
             CreateLevelColliders(level.transform);
 
-            // --- логика ---
             GameObject game = new GameObject("Game");
             CollectibleCounter counter = game.AddComponent<CollectibleCounter>();
             Configure(counter, so => so.FindProperty("total").intValue = BookPositions.Length);
             game.AddComponent<QuitOnEscape>();
 
-            // --- UI ---
             MessageView messageView;
             CreateHud(font, counter, out messageView);
 
-            // --- персонаж ---
             GameObject player = CreatePlayer(spriteMaterial);
 
-            // --- объекты ---
             GameObject props = new GameObject("Props");
             for (int i = 0; i < BookPositions.Length; i++)
                 CreateBook(props.transform, i + 1, BookPositions[i], counter, spriteMaterial);
             CreateRock(props.transform, RockPosition, messageView, font, spriteMaterial);
 
-            // --- камера ---
             CreateCamera(player.transform, bounds);
 
             EditorSceneManager.SaveScene(scene, ScenePath);
@@ -180,10 +161,6 @@ namespace TestTask.EditorTools
                 EditorApplication.Exit(1);
         }
 
-        // =====================================================================
-        //  Импорт
-        // =====================================================================
-
         private static void ImportEnvironment(string path, Vector2 pivot)
         {
             TextureImporter ti = Importer(path);
@@ -201,15 +178,11 @@ namespace TestTask.EditorTools
             ti.ReadTextureSettings(settings);
             settings.spriteAlignment = (int)SpriteAlignment.Custom;
             settings.spritePivot = pivot;
-            settings.spriteMeshType = SpriteMeshType.FullRect; // прямоугольник без прозрачности — лишняя геометрия не нужна
+            settings.spriteMeshType = SpriteMeshType.FullRect;
             ti.SetTextureSettings(settings);
             ti.SaveAndReimport();
         }
 
-        /// <summary>
-        /// Пропы: pivot ставится в нижнюю точку непрозрачной части (основание объекта),
-        /// PPU подбирается так, чтобы видимая часть имела нужную ширину в мире.
-        /// </summary>
         private static void ImportProp(string path, float worldWidth, int maxSize)
         {
             Color32[] px = ReadPixelsForAnalysis(path, 1024, out int w, out int h);
@@ -242,14 +215,6 @@ namespace TestTask.EditorTools
             Debug.Log($"[ProjectBuilder] {path}: content {content}, pivot {pivot}, ppu {ti.spritePixelsPerUnit:F1}");
         }
 
-        /// <summary>
-        /// У присланного спрайт-листа непрозрачный белый фон. Делаем копию с прозрачностью:
-        /// 1) заливка «почти белого» от краёв изображения — внешний фон;
-        /// 2) крупные замкнутые белые области (просветы между рукой и телом) — тоже фон,
-        ///    мелкие (блики, глаза) остаются;
-        /// 3) кайма в 2 пикселя вокруг фона: сглаженные края контура «отделяются» от белого
-        ///    (alpha по яркости, цвет восстанавливается обратным смешиванием).
-        /// </summary>
         [MenuItem("TestTask/0. Clean Character Sheet")]
         public static void CleanCharacterSheet()
         {
@@ -263,7 +228,7 @@ namespace TestTask.EditorTools
 
             bool IsWhite(Color32 c) => c.r >= 232 && c.g >= 232 && c.b >= 232;
 
-            var state = new byte[n]; // 0 — не обработан, 1 — фон, 2 — белое внутри (оставляем)
+            var state = new byte[n];
             var queue = new int[n];
 
             int FloodFill(int start, byte mark, List<int> collected)
@@ -292,7 +257,6 @@ namespace TestTask.EditorTools
                 }
             }
 
-            // 1. Внешний фон
             for (int x = 0; x < w; x++)
             {
                 if (state[x] == 0 && IsWhite(px[x])) FloodFill(x, 1, null);
@@ -306,8 +270,7 @@ namespace TestTask.EditorTools
                 if (state[r] == 0 && IsWhite(px[r])) FloodFill(r, 1, null);
             }
 
-            // 2. Крупные замкнутые белые области
-            int minHole = (w * h) / 20000; // ~1500 px для 3780x8000
+            int minHole = (w * h) / 20000;
             var component = new List<int>(4096);
             int holes = 0;
             for (int i = 0; i < n; i++)
@@ -320,7 +283,6 @@ namespace TestTask.EditorTools
                 holes++;
             }
 
-            // 3. Кайма: 2 кольца пикселей вокруг фона
             var ring = new byte[n];
             for (int pass = 1; pass <= 2; pass++)
             {
@@ -342,7 +304,7 @@ namespace TestTask.EditorTools
                 }
             }
 
-            const float ink = 40f; // яркость контура
+            const float ink = 40f;
             for (int i = 0; i < n; i++)
             {
                 if (state[i] == 1)
@@ -380,8 +342,6 @@ namespace TestTask.EditorTools
         {
             if (!File.Exists(CharacterSheetPath)) CleanCharacterSheet();
 
-            // Анализ в полном разрешении: ряды в листе ровные (по 1/5 высоты),
-            // а по горизонтали фигуры стоят неравномерно, поэтому ищем их по прозрачным промежуткам.
             Color32[] px = ReadPixelsForAnalysis(CharacterSheetPath, 8192, out int w, out int h);
 
             TextureImporter ti = Importer(CharacterSheetPath);
@@ -401,7 +361,6 @@ namespace TestTask.EditorTools
 
                 for (int col = 0; col < SheetColumns; col++)
                 {
-                    // Граница кадра — середина промежутка между соседними фигурами.
                     int left = col == 0 ? 0 : (figures[col - 1].end + figures[col].start) / 2;
                     int right = col == SheetColumns - 1 ? w : (figures[col].end + figures[col + 1].start) / 2;
                     var clip = new RectInt(left, yMin, right - left, yMax - yMin);
@@ -409,7 +368,6 @@ namespace TestTask.EditorTools
                         throw new Exception($"Empty frame r{row} c{col}");
 
                     clips[row, col] = clip;
-                    // Опора по X — центр головы и плеч: он не «гуляет» при шаге, в отличие от центра рамки.
                     anchors[row, col] = UpperBodyCenterX(px, w, b);
                     feet.Add((b.yMin - yMin) / bandH);
 
@@ -418,8 +376,6 @@ namespace TestTask.EditorTools
                 }
             }
 
-            // Опорная точка по Y (ноги) — медиана нижних краёв, одна на все кадры,
-            // чтобы персонаж не «прыгал» при смене кадра.
             feet.Sort();
             float pivotY = feet[feet.Count / 2];
 
@@ -459,7 +415,6 @@ namespace TestTask.EditorTools
             provider.Apply();
             ti.SaveAndReimport();
 
-            // --- ScriptableObject с кадрами ---
             Dictionary<string, Sprite> sprites = AssetDatabase.LoadAllAssetsAtPath(CharacterSheetPath)
                 .OfType<Sprite>()
                 .ToDictionary(s => s.name);
@@ -483,11 +438,6 @@ namespace TestTask.EditorTools
             Debug.Log($"[ProjectBuilder] Character sheet sliced {SheetColumns}x{SheetRows}, pivotY {pivotY:F3}, ppu {ti.spritePixelsPerUnit:F1}");
         }
 
-        /// <summary>
-        /// Ищет в горизонтальной полосе [yMin, yMax) ровно <paramref name="count"/> фигур:
-        /// непрерывные по X участки с непрозрачными пикселями. Мелкие разрывы склеиваются,
-        /// лишние крошечные участки (соринки) отбрасываются, слипшиеся фигуры делятся по самому «тонкому» месту.
-        /// </summary>
         private static List<(int start, int end)> FindFigures(Color32[] px, int w, int yMin, int yMax, int count)
         {
             var density = new int[w];
@@ -544,7 +494,6 @@ namespace TestTask.EditorTools
             return runs;
         }
 
-        /// <summary>Средний X непрозрачных пикселей в верхних 30% фигуры (голова и плечи).</summary>
         private static float UpperBodyCenterX(Color32[] px, int w, RectInt figure)
         {
             int yFrom = figure.yMax - Mathf.RoundToInt(figure.height * 0.3f);
@@ -642,20 +591,11 @@ namespace TestTask.EditorTools
                 element.FindPropertyRelative("uniqueID").longValue = id;
             }
 
-            // Порядок отрисовки = порядок в списке: Background < Default < Overlay.
             if (!Exists(BackgroundLayer)) Insert(0, BackgroundLayer, 3141592601u);
             if (!Exists(OverlayLayer)) Insert(layers.arraySize, OverlayLayer, 3141592602u);
             tagManager.ApplyModifiedPropertiesWithoutUndo();
         }
 
-        // =====================================================================
-        //  Сцена
-        // =====================================================================
-
-        /// <summary>
-        /// Фон из двух копий: правая отражена по X, поэтому края на стыке совпадают пиксель в пиксель
-        /// (при обычном повторе рисунок сетки на стыке не сходится).
-        /// </summary>
         private static void CreateTiledBackground(string name, Transform parent, string spritePath, int order, Material material)
         {
             var root = new GameObject(name);
@@ -706,7 +646,6 @@ namespace TestTask.EditorTools
             body.sleepMode = RigidbodySleepMode2D.NeverSleep;
             body.sharedMaterial = AssetDatabase.LoadAssetAtPath<PhysicsMaterial2D>(NoFrictionPath);
 
-            // Коллайдер только у ног: персонаж «стоит» на полу, а голова может заходить за объекты.
             var feet = player.AddComponent<CapsuleCollider2D>();
             feet.direction = CapsuleDirection2D.Horizontal;
             feet.size = new Vector2(0.6f, 0.28f);
@@ -774,17 +713,15 @@ namespace TestTask.EditorTools
             sr.sprite = LoadSprite(RockPath);
             if (material != null) sr.sharedMaterial = material;
 
-            Bounds b = sr.sprite.bounds; // pivot у основания: y от 0 до высоты
+            Bounds b = sr.sprite.bounds;
             float width = b.size.x;
             float height = b.max.y;
 
-            // Твёрдое основание — сквозь камень не пройти.
             var solid = go.AddComponent<CapsuleCollider2D>();
             solid.direction = CapsuleDirection2D.Horizontal;
             solid.size = new Vector2(width * 0.85f, height * 0.35f);
             solid.offset = new Vector2(0f, height * 0.18f);
 
-            // Зона взаимодействия.
             var zone = go.AddComponent<CircleCollider2D>();
             zone.isTrigger = true;
             zone.radius = width * 0.85f;
@@ -833,7 +770,7 @@ namespace TestTask.EditorTools
             Stretch(label.rectTransform);
 
             go.AddComponent<FloatingPrompt>();
-            go.SetActive(false); // показывается только когда персонаж в зоне
+            go.SetActive(false);
             return go;
         }
 
@@ -846,7 +783,6 @@ namespace TestTask.EditorTools
             scaler.referenceResolution = new Vector2(1920f, 1080f);
             scaler.matchWidthOrHeight = 0.5f;
 
-            // Счётчик
             Text counterText = CreateText(hud.transform, "Counter", "Книги: 0 / 0", font, 46, TextAnchor.UpperLeft, Color.white);
             counterText.fontStyle = FontStyle.Bold;
             Place(counterText.rectTransform, new Vector2(0f, 1f), new Vector2(40f, -30f), new Vector2(700f, 80f));
@@ -858,13 +794,11 @@ namespace TestTask.EditorTools
                 so.FindProperty("label").objectReferenceValue = counterText;
             });
 
-            // Подсказка по управлению
             Text help = CreateText(hud.transform, "Controls", "WASD / стрелки — движение\nE — взаимодействие\nEsc — выход",
                 font, 26, TextAnchor.UpperRight, new Color(1f, 1f, 1f, 0.7f));
             Place(help.rectTransform, new Vector2(1f, 1f), new Vector2(-40f, -30f), new Vector2(600f, 120f));
             help.gameObject.AddComponent<Shadow>().effectDistance = new Vector2(2f, -2f);
 
-            // Сообщение
             var panel = new GameObject("Message", typeof(RectTransform), typeof(CanvasGroup), typeof(Image));
             panel.transform.SetParent(hud.transform, false);
             Place((RectTransform)panel.transform, new Vector2(0.5f, 0f), new Vector2(0f, 70f), new Vector2(1200f, 110f));
@@ -896,7 +830,6 @@ namespace TestTask.EditorTools
             cam.farClipPlane = 50f;
             go.AddComponent<AudioListener>();
 
-            // Начальная позиция совпадает с тем, что посчитает CameraFollow в Start.
             float halfH = cam.orthographicSize;
             float halfW = halfH * 16f / 9f;
             Rect area = new Rect(-LevelHalfWidth, -StripHeight, LevelHalfWidth * 2f, StripHeight * 2f);
@@ -913,10 +846,6 @@ namespace TestTask.EditorTools
             });
         }
 
-        // =====================================================================
-        //  Helpers
-        // =====================================================================
-
         private static void AddYSort(GameObject go, Renderer renderer, bool isStatic)
         {
             var sorter = go.AddComponent<YSortRenderer>();
@@ -925,7 +854,6 @@ namespace TestTask.EditorTools
                 so.FindProperty("targetRenderer").objectReferenceValue = renderer;
                 so.FindProperty("isStatic").boolValue = isStatic;
             });
-            // Сразу выставляем порядок, чтобы сцена правильно выглядела и в редакторе.
             renderer.sortingOrder = YSortRenderer.CalculateOrder(go.transform.position.y, 100, 0);
         }
 
